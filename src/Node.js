@@ -5,42 +5,42 @@ import Synth from './Synth';
 
 const tone = new Tone();
 
-function nextNote(previous, next) {
-  if (typeof next === 'number') {
-    // relative pitch
-    return tone.midiToNote(tone.noteToMidi(previous) + next);
-  } else {
-    return next;
-  }
-}
-
 export default class Node extends Bus {
-  constructor(...connections) {
+  constructor({ notes, edges = [] } = {}) {
     super();
 
-    connections.forEach(connection => {
-      this.plug(connection);
-    });
+    this.notes = [].concat(notes);
+
+    this.addEdges(edges);
   }
 
-  plug(options) {
-    const { source, note, dur, when = 0 } = options;
+  nextNote(previous) {
+    let next = this.notes[this.counter % this.notes.length];
 
+    if (typeof next === 'number') {
+      // relative pitch
+      return tone.midiToNote(tone.noteToMidi(previous) + next);
+    } else {
+      return next;
+    }
+  }
+
+  addEdges(edges) {
+    return edges.map(edge => this.addEdge(edge));
+  }
+
+  addEdge({ source, dur, when = 0 }) {
     source.subscribe(event => {
       let payload = event.value();
-      let { voice, note: previousNote } = payload;
+      let { voice, note } = payload;
 
       voice.play({
-        note: nextNote(previousNote, note),
+        note: this.nextNote(note),
         dur: dur,
         when: when
       }, (nextPayload) => {
         this.emit(nextPayload);
       });
     });
-  }
-
-  unplug() {
-
   }
 }

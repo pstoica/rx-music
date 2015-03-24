@@ -2,14 +2,10 @@ import Bacon from 'baconjs';
 import Tone from 'tone';
 import Metronome from './src/Metronome';
 import VoiceGroup from './src/VoiceGroup';
-import Node from './src/node';
+import Node from './src/Node';
 
 window.Transport = Tone.Transport;
 Tone.Transport.bpm.value = 80;
-
-setTimeout(() => {
-  Tone.Transport.start();
-}, 500);
 
 let metronome = new Metronome();
 
@@ -18,21 +14,22 @@ let voice1 = new VoiceGroup({
 });
 
 let node1 = new Node({
-  source: voice1,
-  note: 'c3',
-  dur: '16n'
+  notes: [1, -1],
+  edges: [
+    { source: voice1, dur: '16n' }
+  ]
 });
 
 let node2 = new Node({
-  source: node1,
-  note: +1,
-  when: '8n',
-  dur: '32n'
+  notes: [2, -2, 4],
+  edges: [
+    { source: node1, when: '8n', dur: '32n' }
+  ]
 });
 
-node1.plug({
-  source: node2,
-  note: +1,
-  when: '8n',
-  dur: '16n'
-});
+node1.addEdge({ source: node2, when: '8n', dur: '16n' });
+
+setTimeout(() => {
+  Tone.Transport.start();
+}, 500);
+

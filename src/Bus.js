@@ -10,10 +10,9 @@ export default class Bus {
   }
 
   emit(payload) {
-    this.counter++;
-
     const nextPayload = Object.assign({}, payload, {
-      counter: this.counter
+      id: this.id,
+      counter: this.counter++
     });
 
     console.log(nextPayload);
