@@ -10,9 +10,9 @@ metronome.subscribe(() => {
   console.log('tick');
 });
 
-Tone.Transport.setInterval(function(time){
-  metronome.onNext(time);
-}, "4n");
+Tone.Transport.setInterval(() => {
+  metronome.onNext();
+}, '4n');
 
 function createSynth() {
   var synth = new Tone.MonoSynth({
@@ -28,7 +28,7 @@ function createSynth() {
   return synth;
 }
 
-let _nodes = 0;
+let _nodes = 1;
 
 function createNode(source, options) {
   const id = _nodes++;
@@ -36,8 +36,9 @@ function createNode(source, options) {
   const subject = new Rx.Subject();
   const { note, dur, when } = options;
 
-  source.subscribe(function (time) {
+  source.subscribe(() => {
     Tone.Transport.setTimeout(time => {
+      //console.log(time);
       console.log(id);
       subject.onNext(time);
 
@@ -52,30 +53,36 @@ function createNode(source, options) {
 var node1 = createNode(metronome, {
   note: 60,
   when: '8n',
-  dur: '8n'
+  dur: '16n'
 });
 
 var node2 = createNode(node1, {
-  note: 62,
-  when: '16n',
-  dur: '8n'
-});
-
-var node3 = createNode(node2, {
-  note: 64,
-  when: '16n',
-  dur: '8n'
-});
-
-var node4 = createNode(node3, {
   note: 72,
   when: '8n',
-  dur: '8n'
+  dur: '16n'
 });
 
-var node5 = createNode(node4, {
-  note: 67,
-  when: '4n',
-  dur: '8n'
+var node3 = createNode(node1, {
+  note: 64,
+  when: '16n',
+  dur: '16n'
 });
+
+//var node3 = createNode(node2, {
+  //note: 64,
+  //when: '2n',
+  //dur: '16n'
+//});
+
+//var node4 = createNode(node3, {
+  //note: 72,
+  //when: '4n',
+  //dur: '16n'
+//});
+
+//var node5 = createNode(node4, {
+  //note: 67,
+  //when: '2n',
+  //dur: '16n'
+//});
 
