@@ -1,0 +1,25 @@
+{
+  "name": "rx-music",
+  "private": true,
+  "version": "0.0.1",
+  "description": "",
+  "main": "entry.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pstoica/rx-music.git"
+  },
+  "author": "Patrick Stoica",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pstoica/rx-music/issues"
+  },
+  "homepage": "https://github.com/pstoica/rx-music",
+  "devDependencies": {
+    "rx": "^2.4.6",
+    "tone": "^0.4.2",
+    "waaclock": "^0.5.0"
+  }
+}
