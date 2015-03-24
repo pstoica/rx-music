@@ -1,70 +1,33 @@
-var Rx = require('rx');
-var Tone = require('tone');
+import Bacon from 'baconjs';
+import Tone from 'tone';
+import Metronome from './src/Metronome';
+import Node from './src/node';
 
-var tone = new Tone();
+window.Transport = Tone.Transport;
 Tone.Transport.bpm.value = 80;
-Tone.Transport.start();
+setTimeout(() => {
+  Tone.Transport.start();
+}, 500);
 
-var metronome = new Rx.Subject();
-metronome.subscribe(() => {
-  console.log('tick');
+let metronome = new Metronome();
+
+let node1 = new Node({
+  source: metronome,
+  note: 60,
+  dur: '16n'
 });
 
-Tone.Transport.setInterval(() => {
-  metronome.onNext();
-}, '4n');
+let node2 = new Node({
+  source: node1,
+  note: 69,
+  when: '8n',
+  dur: '32n'
+});
 
-function createSynth() {
-  var synth = new Tone.MonoSynth({
-    filter: {
-      type: 'allpass'
-    },
-    oscillator: {
-      type: 'triangle'
-    }
-  });
-
-  synth.toMaster();
-  return synth;
-}
-
-let _nodes = 1;
-
-function createNode(source, options) {
-  const id = _nodes++;
-  const synth = createSynth();
-  const subject = new Rx.Subject();
-  const { note, dur, when } = options;
-
-  source.subscribe(() => {
-    Tone.Transport.setTimeout(time => {
-      //console.log(time);
-      console.log(id);
-      subject.onNext(time);
-
-      synth.triggerAttackRelease(tone.midiToNote(note + 12), dur, time);
-    }, when);
-  });
-
-  return subject;
-}
-
-
-var node1 = createNode(metronome, {
+node1.plug({
+  source: node2,
   note: 60,
   when: '8n',
-  dur: '16n'
-});
-
-var node2 = createNode(node1, {
-  note: 72,
-  when: '8n',
-  dur: '16n'
-});
-
-var node3 = createNode(node1, {
-  note: 64,
-  when: '16n',
   dur: '16n'
 });
 

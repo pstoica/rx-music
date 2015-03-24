@@ -1,6 +1,6 @@
 ---
 ecmaFeatures:
-  # modules: true
+  modules: true
 
 env:
   es6: true
@@ -16,8 +16,6 @@ rules:
 
   # enforce comma at eol (never before)
   comma-style: [2, "last"]
-
-  strict: [2, "never"]
 
   valid-jsdoc: 1
 
