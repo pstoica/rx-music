@@ -1,0 +1,25 @@
+---
+ecmaFeatures:
+  # modules: true
+
+env:
+  es6: true
+  browser: true
+  node: true
+
+# 0: off, 1: warning, 2: error
+rules:
+  quotes: [2, "single"]
+
+  # 2 spaces indentation
+  indent: [2, 2]
+
+  # enforce comma at eol (never before)
+  comma-style: [2, "last"]
+
+  strict: [2, "never"]
+
+  valid-jsdoc: 1
+
+globals:
+  AudioContext: true
