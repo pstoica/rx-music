@@ -6,23 +6,19 @@ export default class Bus {
   constructor() {
     this.bus = new Bacon.Bus();
     this.id = buses++;
-    this.state = {
-      counter: 0
-    };
+    this.counter = 0;
   }
 
-  emit(state) {
-    let nextState = state;
+  emit(payload) {
+    this.counter++;
 
-    if (typeof state === 'function') {
-      nextState = state(this.state);
-    }
-
-    this.state = Object.assign(this.state, nextState, {
-      counter: this.state.counter + 1
+    const nextPayload = Object.assign({}, payload, {
+      counter: this.counter
     });
 
-    this.bus.push(this.state);
+    console.log(nextPayload);
+
+    this.bus.push(nextPayload);
   }
 
   subscribe(handler) {
