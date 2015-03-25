@@ -17,10 +17,7 @@ export default class Synth {
     });
 
     this.synth.toMaster();
-  }
-
-  play() {
-    this.synth.triggerAttackRelease(...arguments);
+    return this.synth;
   }
 }
 

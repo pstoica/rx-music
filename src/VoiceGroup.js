@@ -1,33 +1,32 @@
-import Bus from './Bus';
-import Synth from './Synth';
-import Tone from 'tone';
 import Teoria from 'teoria';
+import Bacon from 'baconjs';
 
-const tone = new Tone();
+import Synth from './Synth';
 
-export default class VoiceGroup extends Bus {
-  constructor({ source, note = 'c3', scale = 'major' }) {
-    super();
-
+export default class VoiceGroup {
+  constructor({ root = 'c3', scale = 'major' } = {}) {
+    this.bus = new Bacon.Bus();
     this.synth = new Synth();
-    this.note = Teoria.note(note);
-    this.scale = this.note.scale(scale);
+    this.root = Teoria.note(root);
+    this.scale = this.root.scale(scale);
 
-    source.subscribe(event => {
-      this.emit({
-        note: this.note,
-        voice: this
-      });
-    });
+    this.bus.onValue(this.handleValue.bind(this));
+
+    return this.bus;
   }
 
-  play(payload, next) {
-    let { note, duration, when } = payload;
+  handleValue({ note, dur, time }) {
+    this.synth.triggerAttackRelease(this.convertNote(note), dur, time);
+  }
 
-    Tone.Transport.setTimeout(time => {
-      this.synth.play(note.toString(), duration, time);
+  convertNote(note) {
+    let scaleLength = this.scale.scale.length;
+    let octave = this.root.octave() + Math.floor(note / scaleLength);
+    let position = (note % scaleLength) + 1;
 
-      next({ note, voice: this });
-    }, when);
+    let noteName = this.scale.get(position).toString(true) + octave;
+
+    return noteName;
   }
 }
+

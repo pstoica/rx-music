@@ -2,57 +2,111 @@ import Bacon from 'baconjs';
 import Tone from 'tone';
 import Metronome from './src/Metronome';
 import VoiceGroup from './src/VoiceGroup';
-import Node from './src/Node';
+import Teoria from 'teoria';
 
-window.Transport = Tone.Transport;
-Tone.Transport.bpm.value = 80;
+//Tone.Transport.bpm.value = 80;
+
+var tone = new Tone();
+
+//create one of Tone's built-in synthesizers
+var synth = new Tone.MonoSynth();
+
+//connect the synth to the master output channel
+synth.toMaster();
+
+function transportDelay(delay) {
+  return Bacon.fromBinder(sink => {
+    sink(true);
+
+    Tone.Transport.setTimeout(() => {
+      sink(false);
+      sink(new Bacon.End());
+    }, delay);
+  });
+}
+
+function addTime(time, notation) {
+  return time + tone.notationToSeconds(notation);
+}
+
+function holdFor(duration) {
+  return (x) => {
+    let newVal = Object.assign({}, x, {
+      time: addTime(x.time, duration)
+    });
+
+    return Bacon.later(0, newVal)
+      .holdWhen(transportDelay(duration));
+  };
+}
+
+function tick(x) {
+  return Object.assign({}, x, {
+    tick: (x.tick || 0) + 1
+  });
+}
+
+function setNote(note, usePrev = false) {
+  return (x) => Object.assign({}, x, {
+    note: usePrev ?
+      x.note + note :
+      note
+  });
+}
+
+function modNote(note) {
+  return setNote(note, true);
+}
+
+function setDur(dur, usePrev = false) {
+  return (x) => (
+    Object.assign({}, x, {
+    dur: usePrev ?
+      x.dur + dur :
+      dur
+    })
+  );
+}
+
+function modDur(dur) {
+  return setDur(dur, true);
+}
+
+let v1 = new VoiceGroup();
+v1.log();
+
+let b1 = new Bacon.Bus();
+let b2 = new Bacon.Bus();
+
+v1.plug(b1);
+v1.plug(b2);
 
 let metronome = new Metronome();
 
-let voice1 = new VoiceGroup({
-  source: metronome
-});
+b1.plug(
+  metronome
+    .first()
+    .map(tick)
+    .map(setNote(0))
+    .map(setDur('16n'))
+);
 
-let node1 = new Node({
-  notes: 0,
-  edges: [
-    { source: voice1 }
-  ]
-});
+b2.plug(
+  b1.flatMap(holdFor('8n'))
+    .map(tick)
+    .map(modNote(1))
+    .map(setDur('32n'))
+);
 
-let node2 = new Node({
-  notes: [1],
-  edges: [
-    { source: node1, when: '8n' }
-  ]
-});
+b1.plug(
+  b2.flatMap(holdFor('4n'))
+    .map(tick)
+    .map(modNote(-1))
+    .map(setDur('16n'))
+);
 
-let node3 = new Node({
-  notes: [1, -1],
-  edges: [
-    {
-      source: node2,
-      when: '8n',
-      dur: '16n',
-      filter: (counter) => counter % 2 === 0
-    }
-  ]
-});
 
-node2.addEdge({ source: node3, when: '16n' });
 
-let node4 = new Node({
-  notes: [1, -1],
-  edges: [
-    { source: node3, when: '8n' }
-  ]
-});
-
-node3.addEdge({
-  source: node4,
-  when: '16n',
-  filter: (counter) => counter % 2 !== 0
-});
 
 setTimeout(() => {
   Tone.Transport.start();

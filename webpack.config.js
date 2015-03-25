@@ -1,5 +1,5 @@
 module.exports = {
-  devtool: 'eval',
+  devtool: 'eval-source-map',
   entry: './entry.js',
   module: {
     loaders: [
