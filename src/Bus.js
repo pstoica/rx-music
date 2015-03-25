@@ -15,7 +15,7 @@ export default class Bus {
       counter: this.counter++
     });
 
-    console.log(nextPayload);
+    //console.log(nextPayload);
 
     this.bus.push(nextPayload);
   }

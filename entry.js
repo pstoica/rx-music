@@ -14,20 +14,45 @@ let voice1 = new VoiceGroup({
 });
 
 let node1 = new Node({
-  notes: [1, -1],
+  notes: 0,
   edges: [
-    { source: voice1, dur: '16n' }
+    { source: voice1 }
   ]
 });
 
 let node2 = new Node({
-  notes: [2, -2, 4],
+  notes: [1],
   edges: [
-    { source: node1, when: '8n', dur: '32n' }
+    { source: node1, when: '8n' }
   ]
 });
 
-node1.addEdge({ source: node2, when: '8n', dur: '16n' });
+let node3 = new Node({
+  notes: [1, -1],
+  edges: [
+    {
+      source: node2,
+      when: '8n',
+      dur: '16n',
+      filter: (counter) => counter % 2 === 0
+    }
+  ]
+});
+
+node2.addEdge({ source: node3, when: '16n' });
+
+let node4 = new Node({
+  notes: [1, -1],
+  edges: [
+    { source: node3, when: '8n' }
+  ]
+});
+
+node3.addEdge({
+  source: node4,
+  when: '16n',
+  filter: (counter) => counter % 2 !== 0
+});
 
 setTimeout(() => {
   Tone.Transport.start();
