@@ -26,22 +26,22 @@ let b = U.bus.pool(5);
 v[0].plug(
   Bacon
     .mergeAll(b)
-    .map(U.note.add(12))
+    .map(U.note.add, 12)
 );
 
 var high = b[1]
-  .map(U.note.add(12))
+  .map(U.note.add, 12)
   .map(U.random(U.note.add, 2, 4))
   .map(U.random(U.vel.set, 0.5, 0.3));
 
 v[1].plug(
   Bacon.mergeAll(
     high
-      .flatMap(U.time.delay('32n')),
+      .flatMap(U.time.delay, '32n'),
     high
-      .flatMap(U.time.delay('4n'))
-      .map(U.vel.add(-0.2))
-      .map(U.dur.set('8n'))
+      .flatMap(U.time.delay, '4n')
+      .map(U.vel.add, -0.2)
+      .map(U.dur.set, '8n')
   )
 );
 
@@ -66,9 +66,4 @@ b[2].plug(
     .map(U.vel.set(0.2))
 );
 
-Tone.Transport.bpm.value = 140;
-
-setTimeout(() => {
-  Tone.Transport.start();
-}, 500);
-
+U.start();

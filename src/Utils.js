@@ -30,25 +30,6 @@ exports.bus = {
   }
 };
 
-exports.time = {
-  add(add) {
-    return (event) => {
-      let result = clone(event);
-      result.time += tone.notationToSeconds(add);
-      return result;
-    };
-  },
-
-  delay(duration) {
-    return (event) => {
-      return Bacon.once(event)
-        .map(this.add(duration))
-        .delay(0)
-        .holdWhen(transportDelay(duration));
-    };
-  }
-};
-
 exports.cycle = function (transform, ...items) {
   let tick = 0;
 
@@ -77,62 +58,68 @@ exports.stack = function (transform, ...items) {
   };
 };
 
-exports.note = {
-  add(add) {
-    return (event) => {
-      let result = clone(event);
-      result.note = Math.max(0, result.note + add);
-      return result;
-    };
-  },
+function mappable(fn) {
+  return (x, event) => {
+    return event ?
+      fn(x, clone(event)) :
+      (event) => fn(x, clone(event));
+  };
+}
 
-  set(note) {
-    return (event) => {
-      let result = clone(event);
-      result.note = note;
-      return result;
-    };
-  }
+exports.time = {
+  add: mappable((x, event) => {
+    event.time += tone.notationToSeconds(x);
+    return event;
+  }),
+
+  delay: mappable((x, event) => {
+    return Bacon.once(event)
+      .map(exports.time.add(x))
+      .delay(0)
+      .holdWhen(transportDelay(x));
+  })
+};
+
+exports.note = {
+  add: mappable((x, event) => {
+    event.note = Math.max(0, event.note + x);
+    return event;
+  }),
+
+  set: mappable((x, event) => {
+    event.note = x;
+    return event;
+  })
 };
 
 exports.dur = {
-  set(x) {
-    return (event) => {
-      let result = clone(event);
-      result.dur = x;
-
-      return result;
-    };
-  }
+  set: mappable((x, event) => {
+    event.dur = x;
+    return event;
+  })
 };
 
 exports.vel = {
-  add(x) {
-    return (event) => {
-      let result = clone(event);
-      result.vel += x;
+  add: mappable((x, event) => {
+    event.vel += x;
+    return event;
+  }),
 
-      return result;
-    };
-  },
+  multiply: mappable((x, event) => {
+    event.vel *= x;
+    return event;
+  }),
 
-  multiply(x) {
-    return (event) => {
-      let result = clone(event);
-      result.vel *= x;
-
-      return result;
-    };
-  },
-
-  set(x) {
-    return (event) => {
-      let result = clone(event);
-      result.vel = x;
-
-      return result;
-    };
-  }
+  set: mappable((x, event) => {
+    event.vel = x;
+    return event;
+  })
 };
 
+exports.start = function (bpm = 140) {
+  Tone.Transport.bpm.value = bpm;
 
+  setTimeout(() => {
+    Tone.Transport.start();
+  }, 500);
+};
