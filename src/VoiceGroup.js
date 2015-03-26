@@ -15,13 +15,17 @@ export default class VoiceGroup {
     return this.bus;
   }
 
-  handleValue({ note, dur, time }) {
+  handleValue({ note, dur = '32n', time }) {
     this.synth.triggerAttackRelease(this.convertNote(note), dur, time);
   }
 
   convertNote(note) {
+    let downward = note < 0;
+    let sign = downward ? -1 : 1;
+
     let scaleLength = this.scale.scale.length;
-    let octave = this.root.octave() + Math.floor(note / scaleLength);
+
+    let octave = this.root.octave() + (Math.floor(note / scaleLength));
     let position = (note % scaleLength) + 1;
 
     let noteName = this.scale.get(position).toString(true) + octave;

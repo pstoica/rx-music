@@ -1,10 +1,13 @@
 import Bacon from 'baconjs';
 import Tone from 'tone';
 
-export default function Metronome(subdivision = '4n') {
-  return Bacon.fromBinder(sink => {
-    Tone.Transport.setInterval(time => {
-      sink({ time });
-    }, subdivision);
-  });
+export default class Metronome {
+  constructor({ div = '4n', note = 12,
+                dur = '64n', vel = '0.7' } = {}) {
+    return Bacon.fromBinder(sink => {
+      Tone.Transport.setInterval(time => {
+        sink({ time, note, dur, vel });
+      }, div);
+    });
+  }
 }

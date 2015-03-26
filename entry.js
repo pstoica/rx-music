@@ -25,87 +25,118 @@ function transportDelay(delay) {
   });
 }
 
-function addTime(time, notation) {
-  return time + tone.notationToSeconds(notation);
+function clone(event) {
+  return Object.assign({}, event);
+}
+
+function addTime(add) {
+  return (event) => {
+    let result = clone(event);
+    result.time += tone.notationToSeconds(add);
+    return result;
+  };
+}
+
+function addNote(...addable) {
+  let tick = 0;
+
+  return (event) => {
+    let add = addable[tick++ % addable.length];
+
+    let result = clone(event);
+    result.note = Math.max(0, result.note + add);
+    return result;
+  };
+}
+
+function setNote(note) {
+  return (event) => {
+    let result = clone(event);
+    result.note = note;
+    return result;
+  };
+}
+
+function changeVel(mul) {
+  return (event) => {
+    let result = clone(event);
+    result.note *= mul;
+    return result;
+  };
 }
 
 function holdFor(duration) {
-  return (x) => {
-    let newVal = Object.assign({}, x, {
-      time: addTime(x.time, duration)
-    });
-
-    return Bacon.later(0, newVal)
+  return (event) => {
+    return Bacon.once(event)
+      .map(addTime(duration))
+      .delay(0)
       .holdWhen(transportDelay(duration));
   };
 }
 
-function tick(x) {
-  return Object.assign({}, x, {
-    tick: (x.tick || 0) + 1
-  });
+function everyN(n, a, b, x) {
+  return x % n === 0 ? a : b;
 }
 
-function setNote(note, usePrev = false) {
-  return (x) => Object.assign({}, x, {
-    note: usePrev ?
-      x.note + note :
-      note
-  });
-}
+let v1 = new VoiceGroup({ scale: 'minor' });
 
-function modNote(note) {
-  return setNote(note, true);
-}
+let b1 = new Bacon.Bus().log();
+let b2 = new Bacon.Bus().log();
+let b3 = new Bacon.Bus();
+let b4 = new Bacon.Bus();
+let b5 = new Bacon.Bus();
 
-function setDur(dur, usePrev = false) {
-  return (x) => (
-    Object.assign({}, x, {
-    dur: usePrev ?
-      x.dur + dur :
-      dur
-    })
-  );
-}
-
-function modDur(dur) {
-  return setDur(dur, true);
-}
-
-let v1 = new VoiceGroup();
-v1.log();
-
-let b1 = new Bacon.Bus();
-let b2 = new Bacon.Bus();
-
-v1.plug(b1);
-v1.plug(b2);
+v1.plug(Bacon.mergeAll(b1, b2, b5));
 
 let metronome = new Metronome();
 
 b1.plug(
-  metronome
-    .first()
-    .map(tick)
-    .map(setNote(0))
-    .map(setDur('16n'))
+  metronome.first()
 );
 
 b2.plug(
   b1.flatMap(holdFor('8n'))
-    .map(tick)
-    .map(modNote(1))
-    .map(setDur('32n'))
+    .map(addNote(1, 4, 5))
 );
 
 b1.plug(
-  b2.flatMap(holdFor('4n'))
-    .map(tick)
-    .map(modNote(-1))
-    .map(setDur('16n'))
+  b2.flatMap(holdFor('8n'))
+    .map(addNote(-2, -6))
 );
 
+b3.plug(
+  b1.merge(b2).flatMap(stackNotes(2, 4))
+);
 
+b4.plug(
+  b2.flatMap(holdFor('8n'))
+    .map(addNote(1))
+);
+
+b4.plug(
+  Bacon.mergeAll(
+    b2.flatMap(holdFor('16n'))
+      .map(addNote(-1))
+  )
+);
+
+b5.plug(
+  Bacon.mergeAll(
+    b2.flatMap(holdFor('8n'))
+      .map(addNote(3)),
+    b2.flatMap(holdFor('4n'))
+      .map(addNote(3))
+  )
+);
+
+function stackNotes(...notes) {
+  return (event) => {
+    return Bacon.fromArray(notes)
+      .flatMap(note => {
+        return Bacon.once(event).map(addNote(note));
+      });
+  };
+}
 
 
 setTimeout(() => {
