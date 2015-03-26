@@ -4,9 +4,9 @@ import Bacon from 'baconjs';
 import Synth from './Synth';
 
 export default class VoiceGroup {
-  constructor({ root = 'c3', scale = 'major' } = {}) {
+  constructor({ root = 'c3', scale = 'major', synth } = {}) {
     this.bus = new Bacon.Bus();
-    this.synth = new Synth();
+    this.synth = synth || new Synth();
     this.root = Teoria.note(root);
     this.scale = this.root.scale(scale);
 

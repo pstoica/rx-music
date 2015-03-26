@@ -1,8 +1,8 @@
 import Tone from 'tone';
 
 export default class Synth {
-  constructor() {
-    this.synth = new Tone.PolySynth(6, Tone.MonoSynth);
+  constructor({ oscillator = { type: 'triangle' } } = {}) {
+    this.synth = new Tone.PolySynth(12, Tone.MonoSynth);
     this.synth.set({
       filterEnvelope: {
         min: 20000,
@@ -11,9 +11,7 @@ export default class Synth {
       filter: {
         type: 'allpass'
       },
-      oscillator: {
-        type: 'triangle'
-      }
+      oscillator
     });
 
     this.synth.toMaster();
