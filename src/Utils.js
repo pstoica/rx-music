@@ -34,7 +34,8 @@ exports.cycle = function (transform, ...items) {
   let tick = 0;
 
   return (event) => {
-    let item = items[tick++ % items.length];
+    let item = items[tick++];
+    tick = tick % items.length;
 
     return transform(item)(event);
   };
@@ -56,6 +57,10 @@ exports.stack = function (transform, ...items) {
         return transform(item)(event);
       });
   };
+};
+
+exports.passThrough = function (x) {
+  return () => x;
 };
 
 function mappable(fn) {

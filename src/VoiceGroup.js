@@ -1,12 +1,10 @@
 import Teoria from 'teoria';
 import Bacon from 'baconjs';
 
-import Synth from './Synth';
-
 export default class VoiceGroup {
   constructor({ root = 'c3', scale = 'major', synth } = {}) {
     this.bus = new Bacon.Bus();
-    this.synth = synth || new Synth();
+    this.synth = synth;
     this.root = Teoria.note(root);
     this.scale = this.root.scale(scale);
 
@@ -25,6 +23,7 @@ export default class VoiceGroup {
   }
 
   convertNote(note) {
+    // @todo handle negative index
     let downward = note < 0;
     let sign = downward ? -1 : 1;
 

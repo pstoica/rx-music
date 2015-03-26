@@ -2,6 +2,8 @@ import Bacon from 'baconjs';
 import Tone from 'tone';
 
 import { Metronome, Synth, Voice, Utils } from 'RM';
+import Synth1 from './synths/a';
+import Synth2 from './synths/b';
 
 const U = Utils;
 
@@ -10,15 +12,11 @@ let m = new Metronome();
 let v = [
   new Voice({
     scale: 'minor',
-    synth: new Synth({
-      oscillator: { type: 'triangle' }
-    })
+    synth: new Synth2()
   }),
   new Voice({
     scale: 'minor',
-    synth: new Synth({
-      oscillator: { type: 'sine' }
-    })
+    synth: new Synth1()
   })
 ];
 
@@ -37,7 +35,8 @@ var high = b[1]
 v[1].plug(
   Bacon.mergeAll(
     high
-      .flatMap(U.time.delay, '32n'),
+      //.flatMap(U.random(U.time.delay, '32n', '16n'))
+      .flatMap(U.time.delay, '16n'),
     high
       .flatMap(U.time.delay, '4n')
       .map(U.vel.add, -0.2)
@@ -67,3 +66,4 @@ b[2].plug(
 );
 
 U.start();
+
