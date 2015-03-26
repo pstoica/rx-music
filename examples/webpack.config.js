@@ -2,7 +2,9 @@ var path = require('path');
 
 module.exports = {
   devtool: 'eval',
-  entry: './src/index.js',
+  entry: {
+    1: './1.js'
+  },
   module: {
     loaders: [
       {
@@ -14,6 +16,11 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: 'bundle.js'
+    filename: '[name].bundle.js'
+  },
+  resolve: {
+    alias: {
+      'RM': '../src'
+    }
   }
 };

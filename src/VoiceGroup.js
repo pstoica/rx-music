@@ -15,8 +15,13 @@ export default class VoiceGroup {
     return this.bus;
   }
 
-  handleValue({ note, dur = '32n', time }) {
-    this.synth.triggerAttackRelease(this.convertNote(note), dur, time);
+  handleValue({ note, dur = '32n', time, vel }) {
+    this.synth.triggerAttackRelease(
+      this.convertNote(note),
+      dur,
+      time,
+      Math.min(Math.abs(vel), 1)
+    );
   }
 
   convertNote(note) {
