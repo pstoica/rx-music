@@ -20,7 +20,7 @@ let v = [
 ];
 ```
 
-## Click to see each of these steps
+## Click canvas to see each of these steps
 
 ## Metronome
 ```
@@ -39,7 +39,16 @@ U.start();
 b[0].plug(m);
 ```
 
-## Back and Forth
+## First Voice
+```
+// [b0, b1, b2] -> v0
+v[0].plug(
+  // merge all buses into one
+  Bacon.mergeAll(b)
+);
+```
+
+## Two Buses, Back and Forth
 ```
 // b0 -> b1
 b[1].plug(
@@ -74,15 +83,6 @@ b[1].plug(
     .map(
       U.cycle(U.note.add, 2, -2)
     )
-);
-```
-
-## First Voice
-```
-// [b0, b1, b2] -> v0
-v[0].plug(
-  // merge all buses into one
-  Bacon.mergeAll(b)
 );
 ```
 

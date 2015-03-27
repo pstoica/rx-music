@@ -25,10 +25,18 @@ let v = [
 
 function* tutorial() {
   U.start(30);
+
   yield true;
 
   // Copy metronome stream
   b[0].plug(m);
+  yield true;
+
+  v[0].plug(
+    // merge all buses into one
+    Bacon.mergeAll(b)
+  );
+
   yield true;
 
   b[1].plug(
@@ -62,13 +70,6 @@ function* tutorial() {
       .map(
         U.cycle(U.note.add, 2, -2)
       )
-  );
-
-  yield true;
-
-  v[0].plug(
-    // merge all buses into one
-    Bacon.mergeAll(b)
   );
 
   yield true;
