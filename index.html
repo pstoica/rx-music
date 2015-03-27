@@ -3,9 +3,7 @@
 <script>
 function load(name) {
   var script = document.createElement('script');
-
   script.src = './dist/' + name + '.bundle.js';
-
   document.body.innerHTML = '';
   document.head.appendChild(script);
 }
