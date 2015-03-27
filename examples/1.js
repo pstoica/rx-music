@@ -1,7 +1,9 @@
 import Bacon from 'baconjs';
 import Tone from 'tone';
+import React from 'react';
 
 import { Metronome, Synth, Voice, Utils } from 'RM';
+import Visualizer from './Visualizer';
 import Synth1 from './synths/a';
 import Synth2 from './synths/b';
 
@@ -20,7 +22,7 @@ let v = [
   })
 ];
 
-let b = U.bus.pool(5);
+let b = U.bus.pool(3);
 v[0].plug(
   Bacon
     .mergeAll(b)
@@ -46,6 +48,7 @@ v[1].plug(
 
 b[0].plug(
   m
+    .flatMap(U.time.delay('8n'))
     .map(U.random(U.note.add, 0, 1, 3, 6))
     .map(U.random(U.vel.set, 1, 0.5, 0.3))
     .map(U.dur.set('16n'))
@@ -65,5 +68,8 @@ b[2].plug(
     .map(U.vel.set(0.2))
 );
 
-U.start();
+U.start(80);
 
+window.onload = () => {
+  React.render(<Visualizer metronome={[m]} buses={b} voices={v} />, document.body);
+};

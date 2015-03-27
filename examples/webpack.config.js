@@ -3,7 +3,8 @@ var path = require('path');
 module.exports = {
   devtool: 'eval',
   entry: {
-    1: './1.js'
+    1: './1.js',
+    tutorial: './tutorial.js'
   },
   module: {
     loaders: [
