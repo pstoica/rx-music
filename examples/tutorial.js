@@ -24,7 +24,7 @@ let v = [
 
 
 function* tutorial() {
-  U.start(60);
+  U.start(30);
   yield true;
 
   // Copy metronome stream

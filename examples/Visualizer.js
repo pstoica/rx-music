@@ -2,9 +2,9 @@ import Bacon from 'baconjs';
 import React from 'react/addons';
 import Please from 'pleasejs';
 
-const DOT_WIDTH = 10;
-const MAX_DOT_HEIGHT = 50;
-const DOT_HEIGHT = 20;
+const DOT_WIDTH = 30;
+const MAX_DOT_HEIGHT = 70;
+const DOT_HEIGHT = 30;
 
 export default class Visualizer extends React.Component {
   constructor(props) {
@@ -21,7 +21,7 @@ export default class Visualizer extends React.Component {
     let { metronome, buses, voices } = this.props;
     let total = 1 + buses.length + voices.length;
 
-    let c1 = 'rgb(0,0,0)';
+    let c1 = 'rgb(174,174,174)';
     let colors = [c1];
 
     let c2 = 'rgb(0,0,0)';
@@ -29,9 +29,8 @@ export default class Visualizer extends React.Component {
       colors.push(c2);
     });
 
-    let c3 = Please.make_color({ format: 'rgb-string' })[0];
     voices.forEach(() => {
-      colors.push(c3);
+      colors.push(Please.make_color({ format: 'rgb-string' })[0]);
     });
 
     metronome.concat(buses, voices).forEach((x, i) => {
@@ -62,9 +61,12 @@ export default class Visualizer extends React.Component {
 
       context.rect(dot.x, dot.y - (dot.extraHeight / 2), DOT_WIDTH, DOT_HEIGHT + dot.extraHeight);
       context.fillStyle = dot.color.replace(')', ', ' + dot.life + ')').replace('rgb', 'rgba');
-      //context.fillStyle = `rgba(0, 0, 0, ${dot.life})`;
-
       context.fill();
+
+      context.font = '18px sans-serif';
+      context.textAlign = 'center';
+      context.fillStyle = '#fff';
+      context.fillText(dot.value, dot.x + (DOT_WIDTH / 2), dot.y + 6 + (DOT_HEIGHT / 2));
 
       dot.life = Math.max(dot.life - 0.005, 0.05);
       dot.extraHeight = Math.max(dot.extraHeight - 1, 0);
@@ -75,8 +77,8 @@ export default class Visualizer extends React.Component {
   handleValue(color, y) {
     let canvas = this.refs.canvas.getDOMNode();
 
-    return () => {
-      this.dots.push({ life: 1, extraHeight: MAX_DOT_HEIGHT - DOT_HEIGHT, x: canvas.width - 1, y, color });
+    return (note) => {
+      this.dots.push({ value: note.note, life: 1, extraHeight: MAX_DOT_HEIGHT - DOT_HEIGHT, x: canvas.width - 1, y, color });
       this.dots = this.dots.filter((val) => {
         return val.x > 0 && val.life > 0;
       });
