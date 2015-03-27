@@ -35,11 +35,13 @@ U.start();
 ```
 // Copy metronome stream
 // Plays note 0 every quarter note
+// m -> b0
 b[0].plug(m);
 ```
 
 ## Back and Forth
 ```
+// b0 -> b1
 b[1].plug(
   b[0]
     // take only one event
@@ -50,6 +52,7 @@ b[1].plug(
     .map(U.note.add, 2)
 );
 
+// b1 -> b2
 b[2].plug(
   b[1]
     // delay by 8th note
@@ -62,20 +65,21 @@ b[2].plug(
     )
 );
 
+// b2 -> b1
 b[1].plug(
   b[2]
+    // do the same as b1 -> b2
+    // this time: b2 -> b1
     .flatMap(U.time.delay('8n'))
-    // cycle between:
-    //   note - 2
-    //   note + 2
     .map(
-      U.cycle(U.note.add, -2, 2)
+      U.cycle(U.note.add, 2, -2)
     )
 );
 ```
 
 ## First Voice
 ```
+// [b0, b1, b2] -> v0
 v[0].plug(
   // merge all buses into one
   Bacon.mergeAll(b)
@@ -84,6 +88,7 @@ v[0].plug(
 
 ## Second Voice
 ```
+// v0 -> v1
 v[1].plug(
   v[0]
     .flatMap(U.time.delay('16n'))
