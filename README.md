@@ -1,6 +1,6 @@
 ## WIP
 
-## Setting Up
+## Setting Up (this was done beforehand)
 ```
 let U = ReactiveMusic.Utils;
 
@@ -19,6 +19,8 @@ let v = [
   }),
 ];
 ```
+
+## Click to see each of these steps
 
 ## Metronome
 ```

@@ -86,8 +86,5 @@ function* tutorial() {
   yield true;
 }
 
-window.onload = () => {
-  React.render(<Visualizer tutorial={tutorial} metronome={[m]} buses={b} voices={v} />, document.body);
-};
-
+React.render(<Visualizer tutorial={tutorial} metronome={[m]} buses={b} voices={v} />, document.body);
 

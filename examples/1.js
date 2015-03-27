@@ -69,7 +69,3 @@ b[2].plug(
 );
 
 U.start(80);
-
-window.onload = () => {
-  React.render(<Visualizer metronome={[m]} buses={b} voices={v} />, document.body);
-};

@@ -1,7 +1,16 @@
 <html>
 <head>
-<script src="./dist/1.bundle.js"></script>
+<script>
+function load(name) {
+  var script = document.createElement('script');
+  script.src = './dist/' + name + '.bundle.js';
+  document.body.innerHTML = '';
+  document.head.appendChild(script);
+}
+</script>
 </head>
 </body>
+<button onclick="load('1')">example</button>
+<button onclick="load('tutorial')">tutorial</button>
 </body>
 </html>
